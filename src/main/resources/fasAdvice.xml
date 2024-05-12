@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+        
+        <bean id = "optimistic_retry_advice" class = "com.mine.core.OptimisticRetryInterceptor" >
+        </bean>
+        
+         <bean id = "access_audit_advice" class = "com.mine.core.AccessAuditLogAdvice" >
+        </bean>
+        
+        <bean id = "optimistic_retry_advisor" parent="fas_pointcut_advisor" >
+        	<property name="advice" ref="optimistic_retry_advice" />
+        	<property name="order" value="200" />
+        </bean>
+        
+        <bean id = "access_audit_advisor" parent="fas_pointcut_advisor" >
+        	<property name="advice" ref="access_audit_advice" />
+        	<property name="order" value="100" />
+        </bean>
+        
+        <bean id = "fas_pointcut_advisor" class = "org.springframework.aop.support.RegexpMethodPointcutAdvisor" abstract="true" >
+       		<property name = "patterns" >
+       			<list>
+       				<value>com.mine.core.impl.MyBizSvc.*</value>
+       			</list>
+       		</property> 
+        </bean>
+        
+		<bean id="swapper" class="org.springframework.aop.target.HotSwappableTargetSource">
+    		<constructor-arg ref="myFas"/>
+		</bean>
+		
+        <bean id = "fas_proxy" class = "org.springframework.aop.framework.ProxyFactoryBean" >
+        	<!-- <property name = "target" ref = "myFas" /> -->
+        	<property name = "targetSource" ref = "swapper" />
+        	<property name="singleton" value = "true" />
+        	<property name="proxyTargetClass" value = "false" />
+        	<property name="exposeProxy" value = "true" />
+        	<property name="interceptorNames">
+        		<list>
+        			<value>optimistic_retry_advice</value>
+        			<value>access_audit_advice</value>
+        		</list>
+        	</property>
+        </bean>
+        
+        
+        <!-- <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		    <property name="beanNames" value="myFas"/>
+		    <property name="interceptorNames">
+		        <list>
+		            <value>optimistic_retry_advice</value>
+        			<value>access_audit_advice</value>	
+		        </list>
+		    </property>
+		</bean> -->
+		
+		
+		<!-- https://openhome.cc/Gossip/SpringGossip/DefaultAdvisorAutoProxyCreator.html  -->
+		<!-- Spring 3 really need this to scan all beans which match PointcutAdvisors -->
+		<!-- <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/> -->
+		
+		<bean id="my_pointcut" class="com.mine.core.MyPointcut" />
+		
+		<!-- <bean id="my_pointcut_advisor" class="com.mine.core.MyPointcutAdvisor">
+			<property name="advice" ref="access_audit_advice" />
+			<property name="pointcut" ref="my_pointcut" />
+			<property name="order" value="200" />
+		</bean>  -->
+		
+		<bean id="default_pointcut_advisor" class="org.springframework.aop.support.DefaultPointcutAdvisor" >
+			<property name="advice" ref="access_audit_advice" />
+			<property name="pointcut" ref="my_pointcut" />
+			<property name="order" value="200" />
+		</bean>
+		
+		
+</beans>
