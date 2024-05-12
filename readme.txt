@@ -1,2 +1,6 @@
-http://www.alexecollins.com/tutorial-hibernate-jpa-part-1/
-https://docs.jboss.org/hibernate/orm/3.6/quickstart/en-US/html/hibernate-gsg-tutorial-jpa.html
+1. AOP & DI Exercise
+2. Junit Exercise
+3. concurrency Exercise
+4. JPA exercise:
+  - nhttp://www.alexecollins.com/tutorial-hibernate-jpa-part-1/
+  - https://docs.jboss.org/hibernate/orm/3.6/quickstart/en-US/html/hibernate-gsg-tutorial-jpa.html
